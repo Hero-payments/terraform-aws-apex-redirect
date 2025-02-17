@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/Hero-payments/terraform-aws-apex-redirect/compare/v1.4.0...v1.5.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* put certificate in global region for cloudfront ([86a6ec4](https://github.com/Hero-payments/terraform-aws-apex-redirect/commit/86a6ec4694121464634ffb4de744819f0b3582c6))
+
 ## [1.4.0](https://github.com/Hero-payments/terraform-aws-apex-redirect/compare/v1.3.0...v1.4.0) (2025-02-17)
 
 
