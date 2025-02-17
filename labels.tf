@@ -8,5 +8,3 @@ module "labels" {
   repository  = var.source_repository
   extra_tags  = var.tags
 }
-
-resource "random_pet" "bucket" {}
