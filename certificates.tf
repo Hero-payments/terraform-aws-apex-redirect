@@ -10,19 +10,17 @@ resource "aws_acm_certificate" "cert" {
 
 resource "aws_route53_record" "cert_validations" {
   for_each = {
-    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+    for domain in var.source_domains : domain => {
+      zone_id = aws_route53_zone.zones[domain].zone_id
     }
   }
 
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = tolist(aws_acm_certificate.cert.domain_validation_options)[index(var.source_domains, each.key)].resource_record_name
+  records         = [tolist(aws_acm_certificate.cert.domain_validation_options)[index(var.source_domains, each.key)].resource_record_value]
   ttl             = 60
-  type            = each.value.type
-  zone_id         = aws_route53_zone.zones[each.key].zone_id
+  type            = tolist(aws_acm_certificate.cert.domain_validation_options)[index(var.source_domains, each.key)].resource_record_type
+  zone_id         = each.value.zone_id
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
