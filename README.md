@@ -22,7 +22,7 @@ The deployed infrastructure includes:
 1. Create a `terraform.tfvars` file:
 ```hcl
 source_domains     = ["example.com", "example.net", "example.org"]
-destination_domain = "www.destination.com"
+target_domain      = "www.destination.com"
 ```
 
 2. Initialize Terraform:
