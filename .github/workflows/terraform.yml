@@ -1,0 +1,115 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.tf'
+  pull_request:
+    paths:
+      - '**.tf'
+    branches:
+      - main
+
+
+env:
+  TERRAFORM_VERSION: 1.10.3
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  tflint:
+    name: Terraform static tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout source code
+
+      - uses: actions/cache@v4
+        name: Cache plugin dir
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ hashFiles('.tflint.hcl') }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+      - name: Validate
+        run: terraform validate
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
+      - name: Show version
+        run: tflint --version
+      - name: Init TFLint
+        run: tflint --init
+      - name: Run tflint
+        run: tflint -f compact
+      - name: Run terraform format
+        run: terraform fmt -check
+
+  trivy:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy scanner
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          scan-type: config
+          hide-progress: true
+          output: trivy.txt
+
+      - name: Publish Trivy Output to Summary
+        run: |
+          cat trivy.txt || echo "No output, skipping"
+          if [[ -s trivy.txt ]]; then
+            {
+              echo "### Security Output"
+              echo "<details><summary>Click to expand</summary>"
+              echo ""
+              echo '```terraform'
+              cat trivy.txt
+              echo '```'
+              echo "</details>"
+            } >> $GITHUB_STEP_SUMMARY
+          fi
+
+  publish:
+    name: 'Publish new release'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for tags
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install standard-version
+        run: npm install -g standard-version
+
+      - name: Bump version and create tag
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          standard-version --release-as minor
+          git push --follow-tags origin main
+
+      - name: Get latest tag
+        id: get_tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create ${{ env.tag }} --generate-notes
