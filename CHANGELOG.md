@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/Hero-payments/terraform-aws-apex-redirect/compare/v1.3.0...v1.4.0) (2025-02-17)
+
+
+### Bug Fixes
+
+* cert validation item determinism ([78c810f](https://github.com/Hero-payments/terraform-aws-apex-redirect/commit/78c810fed626cb90cd4a79bb85a30b6ce7950532))
+
 ## [1.3.0](https://github.com/Hero-payments/terraform-aws-apex-redirect/compare/v1.2.0...v1.3.0) (2025-02-17)
 
 
