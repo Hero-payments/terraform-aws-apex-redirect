@@ -1,4 +1,5 @@
 resource "aws_acm_certificate" "cert" {
+  provider                  = aws.acm
   domain_name               = var.source_domains[0]
   subject_alternative_names = slice(var.source_domains, 1, length(var.source_domains))
   validation_method         = "DNS"
@@ -24,6 +25,7 @@ resource "aws_route53_record" "cert_validations" {
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
+  provider                = aws.acm
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validations : record.fqdn]
 }
