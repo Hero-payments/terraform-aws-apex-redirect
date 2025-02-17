@@ -55,7 +55,7 @@ terraform apply
 | managed_by | The team responsible for managing the resources | `string` | `"platform"` |    no    |
 | environment | The environment the resources are deployed to | `string` | `"prod"` |    no    |
 | tags | Extra tags to add to the created resources | `map(string)` | `{}` |    no    |
-| source_repository | The repository calling this module | `string` | n/a |   yes    |
+| source_repository | The repository calling this module | `string` | "" |   no    |
 
 ### Example Usage
 
