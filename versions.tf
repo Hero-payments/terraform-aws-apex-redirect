@@ -13,7 +13,3 @@ terraform {
     }
   }
 }
-
-provider "aws" {}
-
-provider "random" {}
