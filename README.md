@@ -7,7 +7,7 @@ This Terraform project sets up HTTPS redirections for apex domains (naked domain
 The deployed infrastructure includes:
 - One Route53 zone per source domain
 - A DNS records for each domain pointing to a CloudFront distribution
-- One CloudFront distribution per source domain
+- One CloudFront distribution
 - An SSL/TLS certificate (ACM) covering all source domains
 - A single S3 bucket configured as a website for redirection
 

@@ -6,16 +6,14 @@ resource "aws_route53_record" "redirects" {
   type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.redirects[each.key].domain_name
-    zone_id                = aws_cloudfront_distribution.redirects[each.key].hosted_zone_id
+    name                   = aws_cloudfront_distribution.redirect.domain_name
+    zone_id                = aws_cloudfront_distribution.redirect.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
-# One cloudfront per redirected domain
-resource "aws_cloudfront_distribution" "redirects" {
-  for_each = toset(var.source_domains)
-
+# One cloudfront, multiple domains
+resource "aws_cloudfront_distribution" "redirect" {
   origin {
     domain_name = aws_s3_bucket_website_configuration.redirect.website_endpoint
     origin_id   = "S3-redirect"
@@ -29,7 +27,7 @@ resource "aws_cloudfront_distribution" "redirects" {
   }
 
   enabled             = true
-  aliases             = [each.key]
+  aliases             = var.source_domains # Liste de tous les domaines sources
   default_root_object = ""
 
   default_cache_behavior {
@@ -61,6 +59,5 @@ resource "aws_cloudfront_distribution" "redirects" {
 
   price_class = "PriceClass_100"
 
-  tags       = module.labels.tags
   depends_on = [aws_acm_certificate_validation.cert_validation]
 }
